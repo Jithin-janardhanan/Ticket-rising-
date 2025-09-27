@@ -1,0 +1,85 @@
+.ticket-container {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f9fafb !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.ticket-wrapper {
+  max-width: 32rem;
+  width: 100%;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.ticket-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #111827;
+}
+
+.ticket-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ticket-form input,
+.ticket-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.ticket-form textarea {
+  min-height: 100px;
+}
+
+.ticket-form input:focus,
+.ticket-form textarea:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.ticket-form button {
+  background: #2563eb;
+  color: white;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ticket-form button:hover {
+  background: #1d4ed8;
+}
+
+.ticket-message {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+  color: green;
+}
+html, body {
+  background-color: #f9fafb !important;
+  margin: 0;
+  padding: 0;
+}
+.file-name {
+  font-size: 0.875rem;
+  color: #374151;
+  margin-top: 0.25rem;
+}
+

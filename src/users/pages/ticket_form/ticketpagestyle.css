@@ -1,0 +1,66 @@
+/* --- TICKETS PAGE STYLING --- */
+.tickets-page {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1e293b;
+}
+
+.tickets-page h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  color: #0f172a;
+}
+
+/* Individual ticket card */
+.ticket-item {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ticket-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.ticket-item h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  color: #1e293b;
+}
+
+.ticket-item p {
+  margin: 5px 0;
+  font-size: 1rem;
+  color: #334155;
+}
+
+.ticket-item p strong {
+  color: #0f172a;
+}
+
+/* No tickets message */
+.tickets-page .no-tickets {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #64748b;
+  margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tickets-page {
+    margin: 20px;
+    padding: 15px;
+  }
+
+  .ticket-item {
+    padding: 12px 15px;
+  }
+}

@@ -1,14 +1,7 @@
 /* Login.css */
 
 /* Container and Layout */
-/* .login-container {
-  min-height: 100vh;
-  background-color: #f9fafb;
-  display: block !important;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1rem;
-} */
+
 .login-container {
   min-height: 100vh !important;
   width: 100vw !important;
@@ -50,7 +43,7 @@
 /* Form Fields */
 .form-group {
   margin-bottom: 1rem;
-}
+}       
 
 .form-label {
   display: block;
@@ -189,4 +182,25 @@
   color: #ef4444;
   font-size: 0.75rem;
   margin-top: 0.25rem;
+}
+.ticket-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.ticket-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.ticket-text a {
+  font-weight: 500;
+  color: #16a34a;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.ticket-text a:hover {
+  color: #15803d;
+  text-decoration: underline;
 }

@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import './Login.css';
+import { Link } from "react-router-dom";
+import { useLogin } from "../../hooks/authhooks";
+
+import "./login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const { handleLogin, loading, error } = useLogin();
 
   const clearForm = () => {
     setEmail("");
@@ -14,46 +16,8 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const response = await fetch("http://192.168.1.5:8003/api/users/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
-      }
-
-      const data = await response.json();
-      console.log("Login success:", data);
-
-      // Save the access token
-      if (data.access) {
-        localStorage.setItem("authToken", data.access);
-      }
-
-      // Optionally store refresh token if you plan to refresh later
-      if (data.refresh) {
-        localStorage.setItem("refreshToken", data.refresh);
-      }
-
-      // Clear form
-      clearForm();
-
-      // Navigate to Helpdesk Dashboard
-      navigate("/helpdesk-dashboard");
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Login Failed: " + error.message);
-    }
+    const success = await handleLogin(email, password);
+    if (success) clearForm();
   };
 
   return (
@@ -91,9 +55,15 @@ function Login() {
               />
             </div>
 
+            {error && <p className="error-text">{error}</p>}
+
             <div className="button-group">
-              <button type="submit" className="btn btn-primary">Login</button>
-              <button type="button" onClick={clearForm} className="btn btn-secondary">Clear</button>
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
+              </button>
+              <button type="button" onClick={clearForm} className="btn btn-secondary">
+                Clear
+              </button>
             </div>
           </form>
         </div>
@@ -102,9 +72,17 @@ function Login() {
           <p className="register-text">
             Don't have an account? <Link to="/register">Register here</Link>
           </p>
+
+          <div className="ticket-link">
+  <p className="ticket-text">
+    Want to raise a complaint without login?{" "}
+    <Link to="/raise-ticket">Click here</Link>
+  </p>
+</div>
         </div>
       </div>
     </div>
+    
   );
 }
 
