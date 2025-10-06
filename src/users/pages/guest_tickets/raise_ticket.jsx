@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { raiseTicket } from "../../services/userservices"; // import service
+import { useState, useEffect } from "react";
+import { raiseTicket } from "../../services/userservices";
 import "./raise_ticket.css";
 
 function RaiseTicket() {
@@ -14,6 +14,21 @@ function RaiseTicket() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [designations, setDesignations] = useState([]); // ✅ store list
+
+  // fetch designation list once
+  useEffect(() => {
+    const fetchDesignations = async () => {
+      try {
+        const response = await fetch("http://192.168.1.5:8003/api/tickets/designationname/");
+        const data = await response.json();
+        setDesignations(data);
+      } catch (error) {
+        console.error("Error fetching designations:", error);
+      }
+    };
+    fetchDesignations();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -78,14 +93,23 @@ function RaiseTicket() {
             onChange={handleChange}
             required
           />
-          <input
-            type="text"
+
+          {/* ✅ Dropdown for designation */}
+          <select
             name="designation_id"
-            placeholder="Designation ID"
+            placeholder="support category"
             value={formData.designation_id}
             onChange={handleChange}
             required
-          />
+          >
+            <option value="">Select Designation</option>
+            {designations.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </select>
+
           <input
             type="text"
             name="subject"
@@ -115,4 +139,3 @@ function RaiseTicket() {
 }
 
 export default RaiseTicket;
- 

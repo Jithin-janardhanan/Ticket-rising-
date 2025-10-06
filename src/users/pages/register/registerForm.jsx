@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { validateRegisterForm } from "./validateRegisterForm";
-import { registerUser } from "../../services/userservices";
+import { registerUser } from "../../services/userauthservice";
 
 function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -123,6 +123,7 @@ function RegisterForm() {
       <button type="submit" className="register-button">
         Register
       </button>
+       
 
       <div className="login_link">
         <p>

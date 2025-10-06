@@ -1,4 +1,4 @@
-import { logoutUser } from "../../services/authService";
+import { logoutUser } from "../../services/userauthservice";
 import { useNavigate } from "react-router-dom";
 
 function SomeComponent() {

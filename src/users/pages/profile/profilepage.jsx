@@ -23,7 +23,9 @@ function ProfilePage() {
       <p><strong>Username:</strong> {profile.username}</p>
       <p><strong>Email:</strong> {profile.email}</p>
       <p><strong>Phone:</strong> {profile.phone_number}</p>
-      <p><strong>Total Complaints:</strong> {profile.complaints.length}</p>
+      {profile?.complaints && (
+  <p><strong>Total Complaints:</strong> {profile.complaints.length}</p>
+)}
     </div></div>
   );
 }

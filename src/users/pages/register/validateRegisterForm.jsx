@@ -22,6 +22,7 @@ export const validateRegisterForm = ({ username, email, password, confirmPasswor
   if (!phoneRegex.test(phone)) {
     errors.phone = "Phone number must be 10 digits.";
   }
+  
 
   return errors;
 };
