@@ -11,6 +11,10 @@ function TicketFormPage() {
   const [file, setFile] = useState(null);
   const [designations, setDesignations] = useState([]);
   const [designationId, setDesignationId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  
 
   // ✅ Fetch designations from API
   useEffect(() => {
@@ -26,22 +30,32 @@ function TicketFormPage() {
 }, [authToken]);
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!designationId) {
-      alert("Please select a designation!");
-      return;
-    }
+  if (!designationId) {
+    alert("Please select a designation!");
+    return;
+  }
 
+  setIsLoading(true); // start loader
+
+  try {
     await createTicket(authToken, subject, description, file, designationId);
 
     setSubject("");
     setDescription("");
     setFile(null);
-    setDesignationId("");[]
-    alert("Ticket submitted successfully!");
-  };
+    setDesignationId("");
+    alert("Ticket submitted successfully! please check your previous tickets for more info");
+  } catch (error) {
+    console.error(error);
+    alert("Error submitting ticket!");
+  } finally {
+    setIsLoading(false); // stop loader
+  }
+};
+
 
   return (
     <div className="ticket-form-page">
@@ -78,7 +92,13 @@ function TicketFormPage() {
 
         <input type="file" onChange={(e) => setFile(e.target.files[0])} />
 
-        <button type="submit">Submit Ticket</button>
+        <button type="submit" className="submit-btn" disabled={isLoading}>
+  {isLoading ? (
+    <div className="loader"></div>
+  ) : (
+    "Submit Ticket"
+  )}
+</button>
       </form>
     </div>
   );

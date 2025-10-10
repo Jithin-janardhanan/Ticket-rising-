@@ -2,8 +2,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/authcontext";
-import { getTicketDetails, updateTicketDescription } from "../../services/userservices";
+import {
+  getTicketDetails,
+  updateTicketDescription,
+  getTicketMessages,
+  sendTicketMessage
+} from "../../services/userservices";
 import "./ticket_details.css";
+
 
 function TicketDetailPage() {
   const { ticketId } = useParams();
@@ -11,21 +17,44 @@ function TicketDetailPage() {
   const { authToken } = useAuth();
 
   const [ticket, setTicket] = useState(null);
+  const [messages, setMessages] = useState([]); // ✅ supporter messages
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   // Update modal state
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [newDescription, setNewDescription] = useState("");
-  const [newImage, setNewImage] = useState(null);   
+  const [newImage, setNewImage] = useState(null);
   const [updating, setUpdating] = useState(false);
 
-  // ---- Fetch Ticket ----
+  const [newMessage, setNewMessage] = useState(""); // message input
+const [sendingMessage, setSendingMessage] = useState(false); // loader
+
+const handleSendMessage = async () => {
+  try {
+    setSendingMessage(true);
+    const newMsg = await sendTicketMessage(ticketId, newMessage, authToken);
+    setMessages(prev => [newMsg, ...prev]); // prepend
+    setNewMessage("");
+  } catch (err) {
+    alert("Error sending message: " + err.message);
+  } finally {
+    setSendingMessage(false);
+  }
+};
+
+
+
+  // ---- Fetch Ticket & Messages ----
   useEffect(() => {
-    const fetchTicket = async () => {
+    const fetchTicketData = async () => {
       try {
-        const data = await getTicketDetails(ticketId, authToken);
-        setTicket(data);
+        const [ticketData, messageData] = await Promise.all([
+          getTicketDetails(ticketId, authToken),
+          getTicketMessages(ticketId, authToken),
+        ]);
+        setTicket(ticketData);
+        setMessages(messageData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -34,7 +63,7 @@ function TicketDetailPage() {
     };
 
     if (authToken && ticketId) {
-      fetchTicket();
+      fetchTicketData();
     }
   }, [authToken, ticketId]);
 
@@ -141,17 +170,103 @@ function TicketDetailPage() {
               </div>
             </div>
             {ticket?.status && (
-  <span
-    className={`status-badge-large status-${ticket.status
-      .toLowerCase()
-      .replace(/\s+/g, "-")}`}
-  >
-    {ticket.status}
-  </span>
-)}
-
+              <span
+                className={`status-badge-large status-${ticket.status
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")}`}
+              >
+                {ticket.status}
+              </span>
+            )}
           </div>
         </div>
+
+        {/* Supporter Remarks
+        {ticket.remarks && (
+          <div className="ticket-section supporter-remarks-section">
+            <div className="remarks-header">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="icon"
+              >
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              <h2>Supporter Remarks</h2>
+            </div>
+
+            <div className="remarks-highlight">
+              <p>{ticket.remarks}</p>
+            </div>
+          </div>
+        )} */}
+
+      
+
+{/* 🗨️ Reply to Ticket */}
+{ticket && ticket.status.toLowerCase() !== "closed" && (
+  <div className="ticket-section reply-section">
+    <h2>Reply</h2>
+    <textarea
+      rows={3}
+      placeholder="Type your message..."
+      value={newMessage}
+      onChange={(e) => setNewMessage(e.target.value)}
+      className="reply-textarea"
+    />
+    <button
+      onClick={handleSendMessage}
+      disabled={sendingMessage || !newMessage.trim()}
+      className="send-btn"
+    >
+      {sendingMessage ? "Sending..." : "Send"}
+    </button>
+  </div>
+)}
+
+
+        {/* 🗨️ Supporter Messages */}
+{messages.length > 0 && (
+  <div className="ticket-section message-thread">
+    <h2>Supporter Conversation</h2>
+    <div className="messages-container">
+      {messages
+        .slice() // create a shallow copy to avoid mutating original array
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // descending
+        .map((msg) => (
+          <div
+            key={msg.id}
+            className={`message-item ${
+              msg.sender_role === "user" ? "user-msg" : "supporter-msg"
+            }`}
+          >
+            <div className="msg-header">
+              <strong>{msg.sender_name}</strong>
+              <span className="msg-time">
+                {new Date(msg.created_at).toLocaleString()}
+              </span>
+            </div>
+            <p className="msg-text">{msg.message}</p>
+            {msg.image && (
+              <img
+                src={msg.image}
+                alt="message attachment"
+                className="msg-image"
+              />
+            )}
+          </div>
+        ))}
+    </div>
+  </div>
+)}
+
 
         {/* Description & Image */}
         <div className="ticket-section description-image-section">
@@ -201,6 +316,8 @@ function TicketDetailPage() {
             ))}
           </div>
         )}
+
+       
 
         {/* ---- Add Description or Image Button ---- */}
         {ticket.status.toLowerCase() !== "closed" && (

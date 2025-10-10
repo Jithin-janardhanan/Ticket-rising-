@@ -1,6 +1,6 @@
 // src/api/authService.js
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const loginUser = async (email, password) => {
   const response = await fetch(`${BASE_URL}/users/login/`, {
@@ -55,4 +55,23 @@ export const logoutUser = async (authToken, refreshToken, logout) => {
     console.error("Logout error:", err);
   }
 };
+
+// Get messages for a specific ticket
+export const getTicketMessages = async (ticketId, authToken) => {
+  const res = await fetch(
+    `${BASE_URL}/tickets/complaints/${ticketId}/messages/`,
+    {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch ticket messages");
+  }
+
+  return res.json();
+};
+
 
