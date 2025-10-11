@@ -17,26 +17,19 @@ export const loginUser = async (email, password) => {
   return response.json();
 };
 
-export const registerUser = async ({ username, email, password, phone }) => {
-  const response = await fetch(`${BASE_URL}/users/register/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username,
-      email,
-      password,
-      phone_number: phone,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Registration failed");
+export const registerUser = async (userData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/users/register/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+    return response.json();
+  } catch (error) {
+    throw error;
   }
-
-  return await response.json();
 };
+
 export const logoutUser = async (authToken, refreshToken, logout) => {
   if (!authToken || !refreshToken) {
     logout();
@@ -57,21 +50,18 @@ export const logoutUser = async (authToken, refreshToken, logout) => {
 };
 
 // Get messages for a specific ticket
-export const getTicketMessages = async (ticketId, authToken) => {
-  const res = await fetch(
-    `${BASE_URL}/tickets/complaints/${ticketId}/messages/`,
-    {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    }
-  );
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch ticket messages");
+export const verifyOtp = async (email, otp) => {
+  try {
+    const res = await fetch(`${BASE_URL}/users/verify-email/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    });
+    return res.json();
+  } catch (err) {
+    throw err;
   }
-
-  return res.json();
 };
 
 

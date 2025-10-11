@@ -15,12 +15,10 @@ function TicketDetailPage() {
   const { ticketId } = useParams();
   const navigate = useNavigate();
   const { authToken } = useAuth();
-
   const [ticket, setTicket] = useState(null);
   const [messages, setMessages] = useState([]); // ✅ supporter messages
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   // Update modal state
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [newDescription, setNewDescription] = useState("");
@@ -34,14 +32,27 @@ const handleSendMessage = async () => {
   try {
     setSendingMessage(true);
     const newMsg = await sendTicketMessage(ticketId, newMessage, authToken);
-    setMessages(prev => [newMsg, ...prev]); // prepend
+
+    // Instant optimistic display
+    const tempMsg = {
+      ...newMsg,
+      sender_role: "user",
+      sender_name: "You",
+    };
+    setMessages((prev) => [tempMsg, ...prev]);
     setNewMessage("");
+
+    // Then refresh from backend
+    const refreshedMessages = await getTicketMessages(ticketId, authToken);
+    setMessages(refreshedMessages);
   } catch (err) {
     alert("Error sending message: " + err.message);
   } finally {
     setSendingMessage(false);
   }
 };
+
+
 
 
 
@@ -70,7 +81,7 @@ const handleSendMessage = async () => {
   // ---- Handle Update Submit ----
   const handleUpdateSubmit = async () => {
     if (!newDescription.trim() && !newImage) {
-      alert("Please enter a description or select an image.");
+      alert("Please enter a description ");
       return;
     }
 
@@ -83,7 +94,9 @@ const handleSendMessage = async () => {
         newImage
       );
 
-      setTicket(updatedTicket); // update view
+      const refreshed = await getTicketDetails(ticket.ticket_id, authToken);
+setTicket(refreshed);
+ // update view
       setShowUpdateModal(false);
       setNewDescription("");
       setNewImage(null);
@@ -211,7 +224,7 @@ const handleSendMessage = async () => {
       
 
 {/* 🗨️ Reply to Ticket */}
-{ticket && ticket.status.toLowerCase() !== "closed" && (
+{ticket?.status?.toLowerCase() !== "closed" && (
   <div className="ticket-section reply-section">
     <h2>Reply</h2>
     <textarea
@@ -230,6 +243,7 @@ const handleSendMessage = async () => {
     </button>
   </div>
 )}
+
 
 
         {/* 🗨️ Supporter Messages */}
@@ -320,16 +334,18 @@ const handleSendMessage = async () => {
        
 
         {/* ---- Add Description or Image Button ---- */}
-        {ticket.status.toLowerCase() !== "closed" && (
-          <div className="ticket-section add-update-section">
-            <button
-              className="add-update-btn"
-              onClick={() => setShowUpdateModal(true)}
-            >
-              + Add More Description or Image
-            </button>
-          </div>
-        )}
+       {ticket?.status?.toLowerCase() !== "closed" && (
+  <div className="ticket-section add-update-section">
+    <button
+      className="add-update-btn"
+      onClick={() => setShowUpdateModal(true)}
+    >
+      + Add More Description or Image
+    </button>
+  </div>
+)}
+
+
 
         {/* ---- Modal ---- */}
         {showUpdateModal && (
@@ -341,11 +357,11 @@ const handleSendMessage = async () => {
                 onChange={(e) => setNewDescription(e.target.value)}
                 placeholder="Enter your new description..."
               />
-              <input
+              {/* <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => setNewImage(e.target.files[0])}
-              />
+              /> */}
               <div className="modal-actions">
                 <button onClick={() => setShowUpdateModal(false)}>Cancel</button>
                 <button onClick={handleUpdateSubmit} disabled={updating}>
